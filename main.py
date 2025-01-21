@@ -1,3 +1,4 @@
+import os
 import moondream as md
 from PIL import Image
 from PIL import ImageDraw
@@ -130,86 +131,120 @@ def draw_bboxes(image, detections_list, colors=None):
 # up-front to avoid decompression overhead every time the model is initialized.
 print("Loading model...")
 start_time = time.time()
-model = md.vl(model="models/moondream-2b-int8.mf.gz")
-print(f"Model loaded in {time.time()-start_time:.2f} seconds.")
+model_name="moondream-2b-int8.mf.gz"
+model = md.vl(model="models/"+model_name)
+print(f"Model{model_name} loaded in {time.time()-start_time:.2f} seconds.")
 
-# Load and process image
-print("Encoding image...")
-start_time = time.time()
-image_path="screenshot3.png"
-orig_image = Image.open(image_path)
 
-# Obtener las dimensiones originales
-original_width, original_height = orig_image.size
 
-# Calcular el nuevo tamaño manteniendo el aspecto
-max_dimension = 360
-if original_width > original_height:
-    new_width = max_dimension
-    new_height = int((new_width / original_width) * original_height)
-else:
-    new_height = max_dimension
-    new_width = int((new_height / original_height) * original_width)
+while True:
+    print("======================================================")
+    print("\r\r\r\r")
 
-# Redimensionar la imagen
-image = orig_image.resize((new_width, new_height))
-encoded_image = model.encode_image(image)
-print(f"Encoded in {time.time()-start_time:.2f} seconds.")
+    image_path = input("Enter the path to the image file (or type 'exit' to quit): ").strip()
 
-print("Detecting...")
-start_time = time.time()
-whatiwant="people"
-result_adults = model.detect(image, whatiwant)
-print("result:")
-print(result_adults)
-print(f"Found {len(result_adults['objects'])} {whatiwant}")
-print(f"Detected in {time.time()-start_time:.2f} seconds.")
+    # Check for exit condition
+    if image_path.lower() in ['exit', 'x']:
+        print("Exiting the program.")
+        break
 
-if len(result_adults['objects'])>0:
-    print("Detecting...")
+    # Check if the file exists
+    if not os.path.isfile(image_path):
+        print("The file does not exist. Please try again.")
+        continue
+
+    # Check if it's a valid image
+    try:
+        with Image.open(image_path) as img:
+            img.verify()  # Check if it is an image
+        print("The file is a valid image.")
+    except (IOError, SyntaxError):
+        print("The file is not a valid image. Please try again.")
+
+    # Load and process image
+    print("Encoding image...")
     start_time = time.time()
-    whatiwant="kids"
-    result_kids = model.detect(image, whatiwant)
-    print("result:")
-    print(result_kids)
-    print(f"Found {len(result_kids['objects'])} {whatiwant}")
-    print(f"Detected in {time.time()-start_time:.2f} seconds.")
+    orig_image = Image.open(image_path)
 
-    img_width, img_height = orig_image.size
+    # Obtener las dimensiones originales
+    original_width, original_height = orig_image.size
 
-    # Filtrar las detecciones solapadas
-    filtered_adults_result = filter_overlapping_detections(
-        result_adults, 
-        result_kids,
-        iou_threshold=0.5,  # Ajusta este valor según necesites
-        img_width=img_width,
-        img_height=img_height
-    )
-    print(f"Of the {len(result_adults['objects'])} {whatiwant}, {len(result_adults['objects'])-len(filtered_adults_result['objects'])} were children")
-
-if len(result_adults['objects'])==0:
-    print("Detecting...")
-    start_time = time.time()
-    whatiwant="crosswalk"
-    result_crosswalk = model.detect(image, whatiwant)
-    print("result:")
-    print(result_crosswalk)
-    if len(result_crosswalk['objects'])==0:
-        print("There isn't even a crosswalk in the image provided")
+    # Calcular el nuevo tamaño manteniendo el aspecto
+    max_dimension = 360
+    if original_width > original_height:
+        new_width = max_dimension
+        new_height = int((new_width / original_width) * original_height)
     else:
-        print("At least there is a crosswalk in the image provided")
+        new_height = max_dimension
+        new_width = int((new_height / original_height) * original_width)
+
+    # Redimensionar la imagen
+    image = orig_image.resize((new_width, new_height))
+    encoded_image = model.encode_image(image)
+    print(f"Encoded in {time.time()-start_time:.2f} seconds.")
+    print("\r\r")
+
+    print("Detecting...")
+    start_time = time.time()
+    whatiwant="people"
+    result_adults = model.detect(image, whatiwant)
+    #print("result:")
+    #print(result_adults)
+    print(f"Found {len(result_adults['objects'])} {whatiwant}")
+    print(f"Detected in {time.time()-start_time:.2f} seconds.")
+    print("\r\r")
+
+    if len(result_adults['objects'])>0:
+        print("Detecting...")
+        start_time = time.time()
+        whatiwant="kids"
+        result_kids = model.detect(image, whatiwant)
+        #print("result:")
+        #print(result_kids)
+        print(f"Found {len(result_kids['objects'])} {whatiwant}")
+        print(f"Detected in {time.time()-start_time:.2f} seconds.")
+        
+
+        img_width, img_height = orig_image.size
+
+        # Filtrar las detecciones solapadas
+        filtered_adults_result = filter_overlapping_detections(
+            result_adults, 
+            result_kids,
+            iou_threshold=0.5,  # Ajusta este valor según necesites
+            img_width=img_width,
+            img_height=img_height
+        )
+        print(f"Of the {len(result_adults['objects'])} people, {len(result_adults['objects'])-len(filtered_adults_result['objects'])} seem to be children")
+        print("\r\r")
+
+    if len(result_adults['objects'])==0:
+        print("Detecting...")
+        start_time = time.time()
+        whatiwant="crosswalk"
+        result_crosswalk = model.detect(image, whatiwant)
+        #print("result:")
+        #print(result_crosswalk)
+        if len(result_crosswalk['objects'])==0:
+            print("There isn't even a crosswalk in the image provided!!")
+        else:
+            print("At least there is a crosswalk in the image provided")
+        print("\r\r")
 
 
 
 
 
 
+    # Dibujar los bounding boxes filtrados
+    result_image = draw_bboxes(
+        orig_image,
+        [filtered_adults_result, result_kids],
+        colors=[(0,0,255), (153,204,255)]
+    )
 
-# Dibujar los bounding boxes filtrados
-result_image = draw_bboxes(
-    orig_image,
-    [filtered_adults_result, result_kids],
-    colors=[(255,0,0), (0,0,255)]
-)
-result_image.show()
+
+    output_path = f"{os.path.splitext(image_path)[0]}_moonwalked{os.path.splitext(image_path)[1]}"
+    result_image.save(output_path)
+    print(f"Result image saved to {output_path}. Adults' bboxes: blue. Children's bboxes: lightblue")
 

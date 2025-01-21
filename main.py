@@ -3,7 +3,7 @@ import moondream as md
 from PIL import Image
 import time
 from rich.console import Console
-from utils import filter_overlapping_detections, draw_bboxes
+from utils import detection_routine, filter_overlapping_detections, draw_bboxes
 
 console = Console()
 # Initialize with local model path. Can also read .mf.gz files, but we recommend decompressing
@@ -21,78 +21,71 @@ console.print(f"Model {model_name} loaded in {time.time()-start_time:.2f} second
 
 while True:
     console.print("======================================================", style="bold white")
-    #console.print(f"Loading model {model_name}...", style="bold blue")
     print("\r\r\r\r")
 
+    #Ask for image file
     image_path = input("Enter the path to the image file (or type 'exit' to quit): ").strip()
 
-    # Check for exit condition
+    #If exit->exit
     if image_path.lower() in ['exit', 'x']:
         print("Exiting the program.")
         break
 
-    # Check if the file exists
+    # If file doesnt exit, new iteration
     if not os.path.isfile(image_path):
         print("The file does not exist. Please try again.")
         continue
 
-    # Check if it's a valid image
+    # Check if valid image
     try:
         with Image.open(image_path) as img:
-            img.verify()  # Check if it is an image
+            img.verify()
         print("The file is a valid image.")
     except (IOError, SyntaxError):
         print("The file is not a valid image. Please try again.")
 
-    # Load and process image
+    # Resize (for better perfomance) and encode image
     print("Encoding image...")
     start_time = time.time()
     orig_image = Image.open(image_path)
 
-    # Obtener las dimensiones originales
     original_width, original_height = orig_image.size
 
-    # Calcular el nuevo tamaño manteniendo el aspecto
+    # Resize. Max dimension=max dimension and keep original aspect ratio 
     if original_width > original_height:
         new_width = max_dimension
         new_height = int((new_width / original_width) * original_height)
     else:
         new_height = max_dimension
-        new_width = int((new_height / original_height) * original_width)
-
-    # Redimensionar la imagen
+        new_width = int((new_height / original_height) * original_width)   
     image = orig_image.resize((new_width, new_height))
+    
     encoded_image = model.encode_image(image)
     print(f"Encoded in {time.time()-start_time:.2f} seconds.")
     print("\r\r")
 
-    print("Detecting...")
-    start_time = time.time()
-    whatiwant="humans"
 
+    ## Detection
 
+    #Reset variables
     n_people=0
     result_people=[]
     result_kids=[]
     result_crosswalk=[]
 
-    result_people = model.detect(image, whatiwant)
-    #print("result:")
-    #print(result_adults)
+    
+    whatiwant="humans"
+
+
+    result_people = detection_routine(model, image, whatiwant, time)
     console.print(f"Found {len(result_people['objects'])} {whatiwant}", style="bold green")
-    print(f"Detected in {time.time()-start_time:.2f} seconds.")
+
     print("\r\r")
 
     if len(result_people['objects'])>0:
-        print("Detecting...")
-        start_time = time.time()
         whatiwant="kids"
-        result_kids = model.detect(image, whatiwant)
-        #print("result:")
-        #print(result_kids)
+        result_kids = detection_routine(model, image, whatiwant, time)
         console.print(f"Found {len(result_kids['objects'])} {whatiwant}", style="bold green")
-        print(f"Detected in {time.time()-start_time:.2f} seconds.")
-        
 
         img_width, img_height = orig_image.size
 
@@ -112,10 +105,8 @@ while True:
         print("\r\r")
 
     if len(result_people['objects'])==0:
-        print("Detecting...")
-        start_time = time.time()
         whatiwant="crosswalk"
-        result_crosswalk = model.detect(image, whatiwant)
+        result_crosswalk = detection_routine(model, image, whatiwant, time)
         #print("result:")
         #print(result_crosswalk)
         if len(result_crosswalk['objects'])==0:

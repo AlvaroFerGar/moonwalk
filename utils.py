@@ -1,6 +1,23 @@
 from PIL import ImageDraw
 
 
+def detection_routine(model, image, whatiwant, time):
+    """
+    Runs a detection routine using the provided model on the given image.
+    Args:
+        model: The detection model to be used.
+        image: The image on which detection is to be performed.
+        whatiwant: The specific object or feature to detect in the image.
+        time: A module or object that provides the current time (typically the `time` module).
+    Returns:
+        The result of the detection performed by the model.
+    """
+    print("Detecting...")
+    start_time = time.time()
+    result = model.detect(image, whatiwant)  
+    print(f"Detected in {time.time()-start_time:.2f} seconds.")
+    return result
+
 def calculate_iou(box1, box2, img_width, img_height):
     """
     Calcula el IoU (Intersection over Union) entre dos bounding boxes.

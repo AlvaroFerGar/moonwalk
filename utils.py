@@ -1,3 +1,6 @@
+from PIL import ImageDraw
+
+
 def calculate_iou(box1, box2, img_width, img_height):
     """
     Calcula el IoU (Intersection over Union) entre dos bounding boxes.
@@ -40,7 +43,7 @@ def calculate_iou(box1, box2, img_width, img_height):
     # Calcular IoU
     return intersection / union if union > 0 else 0.0
 
-def filter_overlapping_detections(adults_result, kids_result, iou_threshold=0.5, img_width=None, img_height=None):
+def filter_overlapping_detections(global_results, subclass_results, iou_threshold=0.5, img_width=None, img_height=None):
     """
     Filtra las detecciones de adultos que tienen un alto solapamiento con las detecciones de niños.
     
@@ -54,19 +57,19 @@ def filter_overlapping_detections(adults_result, kids_result, iou_threshold=0.5,
     Returns:
     Diccionario con las detecciones de adultos filtradas
     """
-    filtered_adults = {'objects': []}
+    globalfiltered_results = {'objects': []}
     
     # Copiar todos los campos excepto 'objects'
-    for key in adults_result:
+    for key in global_results:
         if key != 'objects':
-            filtered_adults[key] = adults_result[key]
+            globalfiltered_results[key] = global_results[key]
     
     # Para cada detección de adulto
-    for adult_box in adults_result['objects']:
+    for adult_box in global_results['objects']:
         should_keep = True
         
         # Comparar con cada detección de niño
-        for kid_box in kids_result['objects']:
+        for kid_box in subclass_results['objects']:
             iou = calculate_iou(adult_box, kid_box, img_width, img_height)
             
             # Si el IoU es mayor que el umbral, no incluir esta detección de adulto
@@ -76,9 +79,9 @@ def filter_overlapping_detections(adults_result, kids_result, iou_threshold=0.5,
         
         # Si no hay solapamiento significativo con ningún niño, mantener la detección
         if should_keep:
-            filtered_adults['objects'].append(adult_box)
+            globalfiltered_results['objects'].append(adult_box)
     
-    return filtered_adults
+    return globalfiltered_results
 
 def draw_bboxes(image, detections_list, colors=None):
     """

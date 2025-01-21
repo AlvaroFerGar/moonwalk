@@ -1,7 +1,6 @@
 import os
 import moondream as md
 from PIL import Image
-from PIL import ImageDraw
 import time
 from rich.console import Console
 from utils import filter_overlapping_detections, draw_bboxes
@@ -10,6 +9,10 @@ console = Console()
 # Initialize with local model path. Can also read .mf.gz files, but we recommend decompressing
 # up-front to avoid decompression overhead every time the model is initialized.
 model_name = "moondream-2b-int8.mf"
+max_dimension = 248
+
+
+
 console.print(f"Loading model {model_name}...", style="bold")
 start_time = time.time()
 model = md.vl(model="models/" + model_name)
@@ -50,7 +53,6 @@ while True:
     original_width, original_height = orig_image.size
 
     # Calcular el nuevo tamaño manteniendo el aspecto
-    max_dimension = 248
     if original_width > original_height:
         new_width = max_dimension
         new_height = int((new_width / original_width) * original_height)
@@ -68,6 +70,8 @@ while True:
     start_time = time.time()
     whatiwant="humans"
 
+
+    n_people=0
     result_people=[]
     result_kids=[]
     result_crosswalk=[]
@@ -127,7 +131,7 @@ while True:
 
     # Dibujar los bounding boxes filtrados
     result_image=orig_image
-    if(len(filtered_adults_result)>0 | len(result_kids)>0):
+    if(n_people>0):
         result_image = draw_bboxes(
             orig_image,
             [filtered_adults_result, result_kids],

@@ -14,7 +14,7 @@ class MoonWalkUI(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
-        self.setWindowTitle('MoonWalk Interface')
+        self.setWindowTitle('MoonWalk')
         self.setMinimumSize(800, 800)
 
         # Create central widget and main layout
@@ -114,6 +114,8 @@ class MoonWalkUI(QMainWindow):
                     Qt.TransformationMode.SmoothTransformation
                 )
                 label.setPixmap(scaled_pixmap)
+        else:
+            label.clear()
 
     def validate_parameters(self):
         """Validate all parameters before running detection"""
@@ -155,8 +157,11 @@ class MoonWalkUI(QMainWindow):
         )
         
         if file_path:
+            if self.current_image_path != file_path:
+                self.load_and_display_image("", self.output_image_label)
             self.current_image_path = file_path
             self.load_and_display_image(file_path, self.input_image_label)
+
 
     def run_detection(self):
         """Run detection with current parameters and selected image"""

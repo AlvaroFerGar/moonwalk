@@ -8,14 +8,17 @@ from utils import detection_routine, filter_overlapping_detections, draw_bboxes
 console = Console()
 # Initialize with local model path. Can also read .mf.gz files, but we recommend decompressing
 # up-front to avoid decompression overhead every time the model is initialized.
+model_path="models"
 model_name = "moondream-2b-int8.mf"
 max_dimension = 248
-
+people_prompt="humans"
+kids_prompt="kids"
+crosswalk_prompt="crosswalk"
 
 
 console.print(f"Loading model {model_name}...", style="bold")
 start_time = time.time()
-model = md.vl(model="models/" + model_name)
+model = md.vl(model=model_path+"/" + model_name)
 console.print(f"Model {model_name} loaded in {time.time()-start_time:.2f} seconds.", style="bold green")
 
 
@@ -68,29 +71,33 @@ while True:
     ## Detection
 
     #Reset variables
+    n_orig_people=0
     n_people=0
+    n_adults=0
+    n_kids=0
+
     result_people=[]
     result_kids=[]
+    result_adults=[]
     result_crosswalk=[]
 
     
-    whatiwant="humans"
-
-
-    result_people = detection_routine(model, image, whatiwant, time)
-    console.print(f"Found {len(result_people['objects'])} {whatiwant}", style="bold green")
+    result_people = detection_routine(model, image, people_prompt, time)
+    n_orig_people=len(result_people['objects'])
+    console.print(f"Found {n_orig_people} {people_prompt}", style="bold green")
 
     print("\r\r")
 
-    if len(result_people['objects'])>0:
-        whatiwant="kids"
-        result_kids = detection_routine(model, image, whatiwant, time)
-        console.print(f"Found {len(result_kids['objects'])} {whatiwant}", style="bold green")
+    if n_orig_people>0:
+
+        result_kids = detection_routine(model, image, kids_prompt, time)
+        n_kids=len(result_kids['objects'])
+        console.print(f"Found {n_kids} {kids_prompt}", style="bold green")
 
         img_width, img_height = orig_image.size
 
         # Filtrar las detecciones solapadas
-        filtered_adults_result = filter_overlapping_detections(
+        result_adults = filter_overlapping_detections(
             result_people, 
             result_kids,
             iou_threshold=0.5,
@@ -98,15 +105,17 @@ while True:
             img_height=img_height
         )
 
-        n_people=len(filtered_adults_result['objects'])+len(result_kids['objects'])
-        if(len(filtered_adults_result['objects'])+len(result_kids['objects'])>len(result_people['objects'])):
-            console.print(f"Detected {len(filtered_adults_result['objects'])+len(result_kids['objects'])-len(result_people['objects'])} new humans")
-        console.print(f"Of the {n_people} humans, {len(result_kids['objects'])} seem to be children", style="bold blue")
+        n_adults=len(result_adults['objects'])
+        n_people=n_adults+n_kids
+        if(n_people>n_orig_people):
+            console.print(f"Detected {n_people-n_orig_people} new humans")
+        console.print(f"Of the {n_people} humans, {n_kids} seem to be children", style="bold blue")
         print("\r\r")
 
-    if len(result_people['objects'])==0:
-        whatiwant="crosswalk"
-        result_crosswalk = detection_routine(model, image, whatiwant, time)
+    else:
+
+        crosswalk_prompt="crosswalk"
+        result_crosswalk = detection_routine(model, image, crosswalk_prompt, time)
         #print("result:")
         #print(result_crosswalk)
         if len(result_crosswalk['objects'])==0:
@@ -115,17 +124,12 @@ while True:
             print("At least there is a crosswalk in the image provided...")
         print("\r\r")
 
-
-
-
-
-
     # Dibujar los bounding boxes filtrados
     result_image=orig_image
     if(n_people>0):
         result_image = draw_bboxes(
             orig_image,
-            [filtered_adults_result, result_kids],
+            [result_adults, result_kids],
             colors=[(0,0,255), (153,204,255)]
         )
 

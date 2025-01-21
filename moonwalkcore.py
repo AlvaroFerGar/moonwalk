@@ -132,4 +132,6 @@ class MoonWalkCore():
         self.console.print("Adults' bboxes: blue", style="bold blue")
         self.console.print("Children's bboxes: lightblue", style="bold rgb(153,204,255)")
 
+        return output_path
+
 

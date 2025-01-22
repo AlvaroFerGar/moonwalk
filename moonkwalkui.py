@@ -34,6 +34,7 @@ class MoonWalkUI(QMainWindow):
 
         # Max Dimension
         self.max_dimension_input = QLineEdit(str(self.core.max_dimension))
+        self.max_dimension_input.setToolTip("Maximum dimension to which the image will be resized while maintaining aspect ratio")
         config_layout.addRow("Max Dimension:", self.max_dimension_input)
 
         config_group.setLayout(config_layout)
@@ -48,14 +49,14 @@ class MoonWalkUI(QMainWindow):
 
         # People Prompt
         people_layout = QVBoxLayout()
-        people_layout.addWidget(QLabel("Class Prompt:"))
+        people_layout.addWidget(QLabel("Class Prompt: (p.e. humans)"))
         self.people_prompt_input = QLineEdit(self.core.people_prompt)
         people_layout.addWidget(self.people_prompt_input)
         prompts_horizontal.addLayout(people_layout)
 
         # Kids Prompt
         kids_layout = QVBoxLayout()
-        kids_layout.addWidget(QLabel("Sub-class Prompt:"))
+        kids_layout.addWidget(QLabel("Sub-class Prompt: (p.e. kids)"))
         self.kids_prompt_input = QLineEdit(self.core.kids_prompt)
         kids_layout.addWidget(self.kids_prompt_input)
         prompts_horizontal.addLayout(kids_layout)
@@ -102,7 +103,7 @@ class MoonWalkUI(QMainWindow):
         counts_layout = QHBoxLayout()
         counts_layout.addStretch()
         # Class elements count label
-        class_label = QLabel("Number of class elements:")
+        class_label = QLabel("Number of class/humans elements:")
         class_label.setStyleSheet("color: blue;")
         self.class_count_label = QLabel("0")
         self.class_count_label.setStyleSheet("color: blue; font-size: 14pt; font-weight: bold;")
@@ -115,7 +116,7 @@ class MoonWalkUI(QMainWindow):
         counts_layout.addSpacing(20)
 
         # Subclass elements count label
-        subclass_label = QLabel("Number of subclass elements:")
+        subclass_label = QLabel("Number of subclass/kids elements:")
         subclass_label.setStyleSheet("color: rgb(153,204,255);")
         self.subclass_count_label = QLabel("0")
         self.subclass_count_label.setStyleSheet("color: rgb(153,204,255); font-size: 14pt; font-weight: bold;")
@@ -194,6 +195,7 @@ class MoonWalkUI(QMainWindow):
             return
 
         try:
+            self.load_and_display_image("", self.output_image_label)
             self.run_button.setText('WORKING...')
             QApplication.processEvents()
             result_path, n_people, n_kids = self.core.run_detection(self.current_image_path)

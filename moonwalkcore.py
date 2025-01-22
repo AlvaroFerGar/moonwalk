@@ -23,8 +23,6 @@ class MoonWalkCore():
         self.console.print(f"Model {self.model_name} loaded in {time.time()-start_time:.2f} seconds.", style="bold green")
 
     def run_detection(self, image_path):
-                #If exit->exit
-
 
         # If file doesnt exit, new iteration
         if not os.path.isfile(image_path):
@@ -100,8 +98,8 @@ class MoonWalkCore():
             n_adults=len(result_adults['objects'])
             n_people=n_adults+n_kids
             if(n_people>n_orig_people):
-                self.console.print(f"Detected {n_people-n_orig_people} new humans")
-            self.console.print(f"Of the {n_people} humans, {n_kids} seem to be children", style="bold blue")
+                self.console.print(f"Detected {n_people-n_orig_people} new {self.people_prompt}")
+            self.console.print(f"Of the {n_people} {self.people_prompt}, {n_kids} seem to be {self.kids_prompt}", style="bold blue")
             print("\r\r")
 
         else:
@@ -129,8 +127,8 @@ class MoonWalkCore():
         output_path = f"{os.path.splitext(image_path)[0]}_moonwalked{os.path.splitext(image_path)[1]}"
         result_image.save(output_path)
         print(f"Result image saved to {output_path}")
-        self.console.print("Adults' bboxes: blue", style="bold blue")
-        self.console.print("Children's bboxes: lightblue", style="bold rgb(153,204,255)")
+        self.console.print(f"{self.people_prompt} bboxes: blue", style="bold blue")
+        self.console.print(f"{self.kids_prompt} bboxes: lightblue", style="bold rgb(153,204,255)")
 
         return output_path, n_people, n_kids
 

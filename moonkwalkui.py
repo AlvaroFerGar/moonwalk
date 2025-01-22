@@ -93,14 +93,9 @@ class MoonWalkUI(QMainWindow):
         main_layout.addLayout(images_layout)
 
 
-        run_button = QPushButton("Run Detection")
-        run_button.clicked.connect(self.run_detection)
-        main_layout.addWidget(run_button)
-
-
-        # Add Progress Bar
-        self.progress_bar = QProgressBar()
-        main_layout.addWidget(self.progress_bar)
+        self.run_button = QPushButton("Run Detection")
+        self.run_button.clicked.connect(self.run_detection)
+        main_layout.addWidget(self.run_button)
 
         # Create horizontal layout for count labels
         counts_layout = QHBoxLayout()
@@ -159,19 +154,13 @@ class MoonWalkUI(QMainWindow):
             if max_dim <= 0:
                 raise ValueError("Max dimension must be positive")
 
-            # Validate paths and names are not empty
-            if not self.model_path_input.text().strip():
-                raise ValueError("Model path cannot be empty")
-            if not self.model_name_input.text().strip():
-                raise ValueError("Model name cannot be empty")
+            # Validate prompt names are not empty
             if not self.people_prompt_input.text().strip():
                 raise ValueError("People prompt cannot be empty")
             if not self.kids_prompt_input.text().strip():
                 raise ValueError("Kids prompt cannot be empty")
 
             # Update core parameters
-            self.core.model_path = self.model_path_input.text()
-            self.core.model_name = self.model_name_input.text()
             self.core.max_dimension = max_dim
             self.core.people_prompt = self.people_prompt_input.text()
             self.core.kids_prompt = self.kids_prompt_input.text()
@@ -204,7 +193,10 @@ class MoonWalkUI(QMainWindow):
             return
 
         try:
+            self.run_button.setText('WORKING...')
+            QApplication.processEvents()
             result_path, n_people, n_kids = self.core.run_detection(self.current_image_path)
+            self.run_button.setText('Run Detection')
             self.class_count_label.setText(str(n_people))
             self.subclass_count_label.setText(str(n_kids))
             # Assuming run_detection returns the path to the result image

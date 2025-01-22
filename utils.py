@@ -134,7 +134,7 @@ def draw_bboxes(image, detections_list, colors=None):
             draw.rectangle(
                 [(x_min, y_min), (x_max, y_max)],
                 outline=color,
-                width=2
+                width=12
             )
     
     return image_with_boxes

@@ -74,7 +74,7 @@ class MoonWalkCore():
         result_crosswalk=[]
 
 
-        result_people = detection_routine(self.model, image, self.people_prompt, time)
+        result_people = detection_routine(self.model, encoded_image, self.people_prompt, time)
         n_orig_people=len(result_people['objects'])
         self.console.print(f"Found {n_orig_people} {self.people_prompt}", style="bold green")
 
@@ -82,7 +82,7 @@ class MoonWalkCore():
 
         if n_orig_people>0:
 
-            result_kids = detection_routine(self.model, image, self.kids_prompt, time)
+            result_kids = detection_routine(self.model, encoded_image, self.kids_prompt, time)
             n_kids=len(result_kids['objects'])
             self.console.print(f"Found {n_kids} {self.kids_prompt}", style="bold green")
 
@@ -107,7 +107,7 @@ class MoonWalkCore():
         else:
 
             crosswalk_prompt="crosswalk"
-            result_crosswalk = detection_routine(self.model, image, crosswalk_prompt, time)
+            result_crosswalk = detection_routine(self.model, encoded_image, crosswalk_prompt, time)
             #print("result:")
             #print(result_crosswalk)
             if len(result_crosswalk['objects'])==0:

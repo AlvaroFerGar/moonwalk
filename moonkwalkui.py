@@ -50,14 +50,14 @@ class MoonWalkUI(QMainWindow):
 
         # People Prompt
         people_layout = QVBoxLayout()
-        people_layout.addWidget(QLabel("People Prompt:"))
+        people_layout.addWidget(QLabel("Class Prompt:"))
         self.people_prompt_input = QLineEdit(self.core.people_prompt)
         people_layout.addWidget(self.people_prompt_input)
         prompts_horizontal.addLayout(people_layout)
 
         # Kids Prompt
         kids_layout = QVBoxLayout()
-        kids_layout.addWidget(QLabel("Kids Prompt:"))
+        kids_layout.addWidget(QLabel("Sub-class Prompt:"))
         self.kids_prompt_input = QLineEdit(self.core.kids_prompt)
         kids_layout.addWidget(self.kids_prompt_input)
         prompts_horizontal.addLayout(kids_layout)

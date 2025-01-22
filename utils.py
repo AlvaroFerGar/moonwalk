@@ -130,11 +130,12 @@ def draw_bboxes(image, detections_list, colors=None):
             x_max = obj['x_max'] * img_width
             y_max = obj['y_max'] * img_height
             
-            # Dibujar el rectángulo
+
+            rectangle_brush = int(min(img_width, img_height) * 0.01)
             draw.rectangle(
                 [(x_min, y_min), (x_max, y_max)],
                 outline=color,
-                width=12
+                width=rectangle_brush
             )
     
     return image_with_boxes

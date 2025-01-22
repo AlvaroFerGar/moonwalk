@@ -1,8 +1,8 @@
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                             QHBoxLayout, QLabel, QLineEdit, QPushButton, 
-                            QFileDialog, QTextEdit, QGroupBox, QFormLayout, QProgressBar)
+                            QFileDialog, QGroupBox, QFormLayout)
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtGui import QPixmap
 from moonwalkcore import MoonWalkCore
 
 class MoonWalkUI(QMainWindow):
@@ -15,10 +15,11 @@ class MoonWalkUI(QMainWindow):
         self.init_ui()
 
     def init_ui(self):
+        """Initialization of the ui"""
+
         self.setWindowTitle('MoonWalk')
         self.setMinimumSize(800, 800)
 
-        # Create central widget and main layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
@@ -26,7 +27,6 @@ class MoonWalkUI(QMainWindow):
         config_group = QGroupBox("Model Data")
         config_layout = QFormLayout()
 
-        # Model Name como label
         model_label = QLabel("Model:")
         model_name_display = QLabel(self.core.model_name)
         model_name_display.setStyleSheet("font-weight: bold;")
@@ -40,11 +40,10 @@ class MoonWalkUI(QMainWindow):
         config_group.setLayout(config_layout)
         main_layout.addWidget(config_group)
 
-        # Prompts Group
+        # Prompts
         prompts_group = QGroupBox("Detection Prompts")
         prompts_layout = QVBoxLayout()
 
-        # Horizontal layout for people and kids prompts
         prompts_horizontal = QHBoxLayout()
 
         # People Prompt
@@ -94,41 +93,34 @@ class MoonWalkUI(QMainWindow):
 
         main_layout.addLayout(images_layout)
 
-
+        #Botón de run
         self.run_button = QPushButton("Run Detection")
         self.run_button.clicked.connect(self.run_detection)
         main_layout.addWidget(self.run_button)
 
-        # Create horizontal layout for count labels
+        #Contadores
         counts_layout = QHBoxLayout()
         counts_layout.addStretch()
-        # Class elements count label
         class_label = QLabel("Number of class/humans elements:")
         class_label.setStyleSheet("color: blue;")
         self.class_count_label = QLabel("0")
         self.class_count_label.setStyleSheet("color: blue; font-size: 14pt; font-weight: bold;")
 
-        # Add class labels to layout
         counts_layout.addWidget(class_label)
         counts_layout.addWidget(self.class_count_label)
 
-        # Add some spacing between the labels
         counts_layout.addSpacing(20)
 
-        # Subclass elements count label
         subclass_label = QLabel("Number of subclass/kids elements:")
-        subclass_label.setStyleSheet("color: rgb(153,204,255);")
+        subclass_label.setStyleSheet("color: rgb(99,135,170);")
         self.subclass_count_label = QLabel("0")
-        self.subclass_count_label.setStyleSheet("color: rgb(153,204,255); font-size: 14pt; font-weight: bold;")
+        self.subclass_count_label.setStyleSheet("color: rgb(99,135,170); font-size: 14pt; font-weight: bold;")
 
-        # Add subclass labels to layout
         counts_layout.addWidget(subclass_label)
         counts_layout.addWidget(self.subclass_count_label)
 
-        # Add stretch to push labels to the left
         counts_layout.addStretch()
 
-        # Add the counts layout to main layout
         main_layout.addLayout(counts_layout)
 
     def load_and_display_image(self, image_path, label):
@@ -136,7 +128,6 @@ class MoonWalkUI(QMainWindow):
         if image_path:
             pixmap = QPixmap(image_path)
             if not pixmap.isNull():
-                # Scale pixmap to fit in label while maintaining aspect ratio
                 scaled_pixmap = pixmap.scaled(
                     label.size(),
                     Qt.AspectRatioMode.KeepAspectRatio,
@@ -144,25 +135,25 @@ class MoonWalkUI(QMainWindow):
                 )
                 label.setPixmap(scaled_pixmap)
         else:
+            #Cleaning method
             label.clear()
             self.class_count_label.setText(str(0))
-            self.class_count_label.setText(str(0))
+            self.subclass_count_label.setText(str(0))
 
     def validate_parameters(self):
         """Validate all parameters before running detection"""
         try:
-            # Validate max dimension is a number
+            #Max dimension is a number
             max_dim = int(self.max_dimension_input.text())
             if max_dim <= 0:
                 raise ValueError("Max dimension must be positive")
 
-            # Validate prompt names are not empty
             if not self.people_prompt_input.text().strip():
                 raise ValueError("People prompt cannot be empty")
             if not self.kids_prompt_input.text().strip():
                 raise ValueError("Kids prompt cannot be empty")
 
-            # Update core parameters
+            # Update parameters
             self.core.max_dimension = max_dim
             self.core.people_prompt = self.people_prompt_input.text()
             self.core.kids_prompt = self.kids_prompt_input.text()
@@ -202,7 +193,6 @@ class MoonWalkUI(QMainWindow):
             self.run_button.setText('Run Detection')
             self.class_count_label.setText(str(n_people))
             self.subclass_count_label.setText(str(n_kids))
-            # Assuming run_detection returns the path to the result image
             if result_path:
                 self.load_and_display_image(result_path, self.output_image_label)
         except Exception as e:

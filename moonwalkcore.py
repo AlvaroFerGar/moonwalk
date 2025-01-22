@@ -49,7 +49,7 @@ class MoonWalkCore():
         except (IOError, SyntaxError):
             print("The file is not a valid image. Please try again.")
 
-        # Resize (for better perfomance) and encode image
+        # Resize and encode image (for better perfomance)
         print("Encoding image...")
         start_time = time.time()
         orig_image = Image.open(image_path)

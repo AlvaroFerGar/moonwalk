@@ -6,9 +6,10 @@ from PyQt5.QtGui import QPixmap, QImage
 from moonwalkcore import MoonWalkCore
 
 class MoonWalkUI(QMainWindow):
-    def __init__(self):
+    def __init__(self, model_path):
         super().__init__()
         self.core = MoonWalkCore()
+        self.core.model_path=model_path
         self.core.load_model()
         self.current_image_path = None
         self.init_ui()

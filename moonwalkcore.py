@@ -9,19 +9,31 @@ class MoonWalkCore():
     def __init__(self):
         
         self.console = Console()
-        self.model_path="models"
-        self.model_name = "moondream-2b-int8.mf"
+        self.model_path=""
+        self.model_name = ""
         self.max_dimension = 248
         self.people_prompt="humans"
         self.kids_prompt="kids"
         self.crosswalk_prompt="crosswalk"
     
     def load_model(self):
-        self.console.print(f"Loading model {self.model_name}...", style="bold")
-        start_time = time.time()
-        self.model = md.vl(model=self.model_path+"/" + self.model_name)
-        self.console.print(f"Model {self.model_name} loaded in {time.time()-start_time:.2f} seconds.", style="bold green")
+        try:
+            self.console.print(f"Loading model {self.model_name}...", style="bold")
+            start_time = time.time()
 
+            self.model_name=os.path.basename(self.model_path)
+            if not os.path.exists(self.model_path):
+                raise FileNotFoundError(f"Model not found at path: {self.model_path}")
+            self.model = md.vl(model=self.model_path)
+            self.console.print(f"Model {self.model_name} loaded in {time.time()-start_time:.2f} seconds.", style="bold green")
+        
+        except FileNotFoundError as e:
+            self.console.print(f"Error: {str(e)}", style="bold red")
+            raise  # Re-raise the exception to stop execution
+            
+        except Exception as e:
+            self.console.print(f"Error loading model: {str(e)}", style="bold red")
+            raise 
     def run_detection(self, image_path):
 
         # If file doesnt exit, new iteration

@@ -136,7 +136,8 @@ class MoonWalkCore():
             )
 
 
-        output_path = f"{os.path.splitext(image_path)[0]}_moonwalked{os.path.splitext(image_path)[1]}"
+        filename=os.path.basename(image_path)
+        output_path = f"result_images/{os.path.splitext(filename)[0]}_moonwalked{os.path.splitext(filename)[1]}"
         result_image.save(output_path)
         print(f"Result image saved to {output_path}")
         self.console.print(f"{self.people_prompt} bboxes: blue", style="bold blue")

@@ -1,6 +1,6 @@
 # 🚶 🌔 Moonwalk 🌖 🚶
 
-**Moonwalk** is a small PyQt application for testing Moondream models. Its main goal is to detect adults and kids crossing crosswalks. However, since Moondream is a VLM(Vision Language Model), the app can be reconfigured to detect any class-subclass elements (e.g., animal/tiger, fruit/apple).
+**Moonwalk** is a small application for testing Moondream models. Its main goal is to detect adults and kids crossing crosswalks. However, since Moondream is a VLM(Vision Language Model), the app can be reconfigured to detect any class-subclass elements (e.g., animal/tiger, fruit/apple).
 
 ## Installation
 
@@ -18,19 +18,40 @@
     ```sh
     pip install -r requirements.txt
     ```
-4. Download your favourite moondream model a place it on the models folder. 
-5. Run the application:
+4. Download your favourite moondream model a place it on the models folder.
+## Option A: GUI Mode
+5. Run the application (GUI mode):
     ```sh
     python main.py path/to/my/awesomemodel.mf
     ```
-    If you don't especify any path as an argument it will automatically look for a moondream-2b-int8.mf in the models folder
+    If you don't specify any path as an argument, it will automatically look for a `moondream-2b-int8.mf` in the `models` folder:
     ```sh
     python main.py 
     ```
 
-7. Use the GUI to select an image, configure detection parameters, and run the detection. After a few seconds the result will appear on screen.
+6. Use the GUI to select an image, configure detection parameters, and run the detection. After a few seconds, the result will appear on screen.
+   
    ![screenshot](assets/screenshot.png)
-   Output images will be saved on the result_images folder
+
+   Output images will be saved in the `result_images` folder.
+
+### Option B: Console Mode (avoids PyQt dependencies)
+For users who prefer a lightweight option without a graphical user interface, you can run the application in console mode:
+
+5. Use the following command:
+    ```sh
+    python main_console.py path/to/my/awesomemodel.mf
+    ```
+   If you don't specify any path as an argument, it will automatically look for a `moondream-2b-int8.mf` in the `models` folder:
+    ```sh
+    python main_console.py 
+    ```
+6. Use the console to specify the image path and the prompts you want to use
+
+   ![screenshot](assets/screenshot_console.png)
+
+   Output images will be saved in the `result_images` folder.
+   ```
   
 ## Project Structure
 
@@ -43,6 +64,7 @@ moonwalk/
 ├── result_images/
 │   └── resultimages_will_be_saved_here.txt
 ├── main.py
+├── main_console.py
 ├── moonkwalkui.py
 ├── moonwalkcore.py
 ├── utils.py
@@ -50,7 +72,9 @@ moonwalk/
 └── .gitignore
 ```
 
-main.py: Entry point of the application.
+main.py: Entry point of the gui application.
+
+main_console.py: Entry point of the console application.
 
 moonkwalkui.py:Contains the GUI implementation using PyQt5.
 

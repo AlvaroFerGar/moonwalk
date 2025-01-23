@@ -1,6 +1,6 @@
 # 🚶 🌔 Moonwalk 🌖 🚶
 
-**Moonwalk** is a small PyQt application for testing Moondream models. Its original purpose is to detect adults and kids crossing crosswalks. However, since Moondream is a VLM(Vision Language Model), it can be reconfigured to detect any class-subclass elements (e.g., animal/tiger, fruit/apple).
+**Moonwalk** is a small PyQt application for testing Moondream models. Its main goal is to detect adults and kids crossing crosswalks. However, since Moondream is a VLM(Vision Language Model), the app can be reconfigured to detect any class-subclass elements (e.g., animal/tiger, fruit/apple).
 
 ## Installation
 
@@ -61,3 +61,9 @@ utils.py: Utility functions for detection and image processing.
 requirements.txt: List of dependencies required to run the application.
 models
 
+## Mini-Conclusions
+![screenshot](assets/example.png)
+
+Moondream performs well in detecting adults and children on crosswalks when individuals are spaced apart, although the bounding boxes do not always fit perfectly. However, it struggles in crowded scenes or with occlusions. Resizing the image is also recommended for optimal results and to enhance efficiency.
+
+Despite these challenges, its versatility as a VLM allows users to search for any object class, making it adaptable for a wide range of tasks.

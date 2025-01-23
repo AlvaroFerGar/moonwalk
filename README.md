@@ -18,7 +18,7 @@
     ```sh
     pip install -r requirements.txt
     ```
-4. Download your favourite moondream model a place it on the models folder.
+4. Download your favourite moondream model and place it on the models folder.
 ## Option A: GUI Mode
 5. Run the application (GUI mode):
     ```sh
@@ -51,7 +51,6 @@ For users who prefer a lightweight option without a graphical user interface, yo
    ![screenshot](assets/screenshot_console.png)
 
    Output images will be saved in the `result_images` folder.
-   ```
   
 ## Project Structure
 
@@ -83,7 +82,7 @@ moonwalkcore.py: Core logic for loading the model and running detection.
 utils.py: Utility functions for detection and image processing.
 
 requirements.txt: List of dependencies required to run the application.
-models
+
 
 ## Mini-Conclusions
 ![screenshot](assets/example.png)
